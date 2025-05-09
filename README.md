@@ -182,8 +182,8 @@ Content-Type: application/json
 Пример:
 
 ```
-мар 29, 2025 10:15:00 AM com.example.otp.service.OtpService generateOtp
-INFO: OTP Code generated for operation ID: op_12345
+2025-05-10 01:53:00 [main] INFO  org.example.otp.Main - HTTP-сервер запущен на порту 8080
+2025-05-10 01:53:00 [main] INFO  org.example.otp.Main - Сервер работает...
 ```
 
 ---
