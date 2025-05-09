@@ -1,12 +1,47 @@
 version: '3.8'
 
 services:
-  db:
+  otp-service:
+    build: .
+    container_name: otp-service
+    ports:
+      - "8080:8080"
+    volumes:
+      - logs:/app/logs
+    depends_on:
+      - postgres
+      - smpp-sim
+      - mail-hog
+    restart: unless-stopped
+  postgres:
     image: postgres
-    restart: always
-    environment:
-      POSTGRES_DB: otpdb
-      POSTGRES_USER: your_db_user
-      POSTGRES_PASSWORD: your_db_password
+    container_name: postgres
     ports:
       - "5432:5432"
+    environment:
+      POSTGRES_USER: your_db_user
+      POSTGRES_PASSWORD: your_db_password
+      POSTGRES_DB: otpdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+  mail-hog:
+    build:
+      context: MailHog
+    container_name: mail-hog
+    ports:
+      - "1025:1025"   # SMTP testing
+      - "8025:8025"   # Web UI
+    restart: unless-stopped
+  smpp-sim:
+    build:
+      context: SmppSim
+    container_name: smpp-sim
+    ports:
+      - "8888:88"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  logs:
