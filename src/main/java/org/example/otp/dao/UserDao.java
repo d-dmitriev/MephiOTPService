@@ -2,15 +2,16 @@ package org.example.otp.dao;
 
 import org.example.otp.model.User;
 import org.example.otp.util.DbConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 public class UserDao {
-    private static final Logger logger = Logger.getLogger(UserDao.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
 
     public Optional<User> findByLogin(String login) {
         String sql = "SELECT * FROM users WHERE login = ?";
@@ -29,7 +30,7 @@ public class UserDao {
                 return Optional.of(user);
             }
         } catch (SQLException e) {
-            logger.severe("Error finding user by login: " + e.getMessage());
+            logger.error("Ошибка поиска пользователя по логину: {}", e.getMessage());
         }
         return Optional.empty();
     }
@@ -43,9 +44,9 @@ public class UserDao {
             pstmt.setString(2, user.getPasswordHash());
             pstmt.setString(3, user.getRole());
             pstmt.executeUpdate();
-            logger.info("User saved: " + user.getLogin());
+            logger.info("Пользователь сохранен: {}", user.getLogin());
         } catch (SQLException e) {
-            logger.severe("Error saving user: " + e.getMessage());
+            logger.error("Ошибка сохранения пользователя: {}", e.getMessage());
         }
     }
 
@@ -65,7 +66,7 @@ public class UserDao {
                 users.add(user);
             }
         } catch (SQLException e) {
-            logger.severe("Error fetching users: " + e.getMessage());
+            logger.error("Ошибка при извлечении пользователей: {}", e.getMessage());
         }
         return users;
     }
@@ -80,7 +81,7 @@ public class UserDao {
                 return rs.getBoolean(1);
             }
         } catch (SQLException e) {
-            logger.severe("Ошибка проверки существования администратора: " + e.getMessage());
+            logger.error("Ошибка проверки существования администратора: {}", e.getMessage());
         }
         return false;
     }
@@ -92,9 +93,9 @@ public class UserDao {
 
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
-            logger.info("Удален пользователь с идентификатором: " + id);
+            logger.info("Удален пользователь с идентификатором: {}", id);
         } catch (SQLException e) {
-            logger.severe("Ошибка удаления пользователя: " + e.getMessage());
+            logger.error("Ошибка удаления пользователя: {}", e.getMessage());
         }
     }
 }

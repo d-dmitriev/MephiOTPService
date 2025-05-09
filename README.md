@@ -52,7 +52,7 @@
 | **PostgreSQL**             | Хранение данных                    |
 | **JDBC**                   | Подключение к БД                   |
 | **com.sun.net.httpserver** | HTTP сервер                        |
-| **java.util.logging**      | Логирование                        |
+| **SLF4J + Logback**        | Логирование                        |
 | **SMPPSim**                | Эмулятор SMPP для тестирования SMS |
 | **Telegram Bot API**       | Отправка кодов через Telegram      |
 ## 🗃️ Структура базы данных
@@ -102,7 +102,7 @@ mvn clean install
 - `email.properties` — данные для почты
 - `sms.properties` — настройки SMPP
 - `telegram.properties` — токен бота
-- `logging.properties` — уровень логгирования
+- `logback.xml` — уровень логгирования
 
 ### 4. Запустите проект
 
@@ -244,7 +244,7 @@ src/
 │       ├── email.properties
 │       ├── sms.properties
 │       ├── telegram.properties
-│       ├── logging.properties
+│       ├── logback.xml
 │       └── schema.sql
 ```
 

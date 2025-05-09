@@ -3,16 +3,17 @@ package org.example.otp.service;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 public class TelegramNotificationService {
-    private static final Logger logger = Logger.getLogger(TelegramNotificationService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(TelegramNotificationService.class);
 
     private final String telegramApiUrl;
     private final String botToken;
@@ -36,7 +37,7 @@ public class TelegramNotificationService {
             HttpGet request = new HttpGet(url);
             client.execute(request);
         } catch (IOException e) {
-            logger.severe("Ошибка отправки сообщения через Telegram: " + e.getMessage());
+            logger.error("Ошибка отправки сообщения через Telegram: {}", e.getMessage());
         }
     }
 }

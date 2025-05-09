@@ -1,5 +1,7 @@
 package org.example.otp.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smpp.*;
 import org.smpp.pdu.BindResponse;
 import org.smpp.pdu.BindTransmitter;
@@ -9,10 +11,9 @@ import org.smpp.pdu.PDUException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 public class SmsNotificationService extends SmppObject {
-    private static final Logger logger = Logger.getLogger(SmsNotificationService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SmsNotificationService.class);
 
     private String host;
     private int port;
@@ -33,7 +34,7 @@ public class SmsNotificationService extends SmppObject {
             this.systemType = props.getProperty("smpp.system_type");
             this.sourceAddress = props.getProperty("smpp.source_addr");
         } catch (Exception e) {
-            logger.severe("Не удалось загрузить конфигурацию SMS: " + e.getMessage());
+            logger.error("Не удалось загрузить конфигурацию SMS: {}", e.getMessage());
         }
     }
 
@@ -60,15 +61,15 @@ public class SmsNotificationService extends SmppObject {
             submitSM.setShortMessage("Your OTP code: " + code);
 
             session.submit(submitSM);
-            logger.info("Код OTP отправлен по SMS на номер: " + destination);
+            logger.info("Код OTP отправлен по SMS на номер: {}", destination);
         } catch (Exception e) {
-            logger.severe("Не удалось отправить SMS: " + e.getMessage());
+            logger.error("Не удалось отправить SMS: {}", e.getMessage());
         } finally {
             try {
                 session.unbind();
                 connection.close();
             } catch (PDUException | IOException | TimeoutException | WrongSessionStateException e) {
-                logger.severe("Ошибка закрытия сеанса SMPP: " + e.getMessage());
+                logger.error("Ошибка закрытия сеанса SMPP: {}", e.getMessage());
             }
         }
     }

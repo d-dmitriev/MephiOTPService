@@ -6,16 +6,17 @@ import org.example.otp.service.AuthService;
 import org.example.otp.service.OtpService;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.logging.Logger;
 
 import static org.example.otp.util.HttpUtils.*;
 
 public class AdminApi implements HttpHandler {
-    private static final Logger logger = Logger.getLogger(AdminApi.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(AdminApi.class);
     private final OtpService otpService = new OtpService();
     private final AuthService authService = new AuthService();
 
@@ -67,7 +68,7 @@ public class AdminApi implements HttpHandler {
 
         } else {
             sendError(exchange, NOT_FOUND, 404);
-            logger.severe(NOT_FOUND);
+            logger.error(NOT_FOUND);
         }
     }
 }

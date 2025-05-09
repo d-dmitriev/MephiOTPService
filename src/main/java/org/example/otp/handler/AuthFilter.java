@@ -6,14 +6,15 @@ import org.example.otp.model.User;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import static org.example.otp.util.HttpUtils.sendError;
 
 public class AuthFilter implements HttpHandler {
-    private static final Logger logger = Logger.getLogger(AuthFilter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(AuthFilter.class);
 
     private final HttpHandler next;
     private final String requiredRole;
@@ -32,7 +33,7 @@ public class AuthFilter implements HttpHandler {
         // Извлекаем токен
         String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            logger.warning(String.format("Доступ запрещен к %s %s: отсутствует или недействителен токен", method, path));
+            logger.warn("Доступ запрещен к {} {}: отсутствует или недействителен токен", method, path);
             sendError(exchange, "Отсутствует или недействителен токен", 401);
             return;
         }
@@ -42,7 +43,7 @@ public class AuthFilter implements HttpHandler {
         StringBuilder usernameBuilder = new StringBuilder();
 
         if (!tokenUtil.validateToken(token, usernameBuilder)) {
-            logger.warning(String.format("Доступ запрещен к %s %s: недействительный или просроченный токен", method, path));
+            logger.warn("Доступ запрещен к {} {}: недействительный или просроченный токен", method, path);
             sendError(exchange, "Недействительный или просроченный токен", 401);
             return;
         }
@@ -51,19 +52,19 @@ public class AuthFilter implements HttpHandler {
         User user = new UserDao().findByLogin(username).orElse(null);
 
         if (user == null) {
-            logger.warning(String.format("Пользователь не найден для токена: %s", username));
+            logger.warn("Пользователь не найден для токена: {}", username);
             sendError(exchange, "Пользователь не найден", 401);
             return;
         }
 
         // Проверяем роль
         if (!user.getRole().equals(requiredRole) && !user.getRole().equals("ADMIN")) {
-            logger.warning(String.format("Доступ запрещен для %s %s: пользователь не %s", method, path, requiredRole));
+            logger.warn("Доступ запрещен для {} {}: пользователь не {}", method, path, requiredRole);
             sendError(exchange, "Доступ запрещен", 403);
             return;
         }
 
-        logger.info(String.format("Пользователь '%s' получил доступ к %s %s", username, method, path));
+        logger.info("Пользователь '{}' получил доступ к {} {}", username, method, path);
 
         exchange.getHttpContext().getAttributes().put("username", username);
 
@@ -71,7 +72,7 @@ public class AuthFilter implements HttpHandler {
         try {
             next.handle(exchange);
         } catch (Exception e) {
-            logger.severe("Ошибка в обработчике: " + e.getMessage());
+            logger.error("Ошибка в обработчике: {}", e.getMessage());
             sendError(exchange, "Внутренняя ошибка сервера", 500);
         }
     }

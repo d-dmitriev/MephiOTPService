@@ -1,5 +1,8 @@
 package org.example.otp.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -7,10 +10,9 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.logging.Logger;
 
 public class TokenUtil {
-    private static final Logger logger = Logger.getLogger(TokenUtil.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(TokenUtil.class);
 
     // Секретный ключ для подписи токена
     private static final String SECRET_KEY = "my_very_secret_key_for_signing_tokens";
@@ -29,7 +31,7 @@ public class TokenUtil {
                 "." +
                 Base64.getEncoder().encodeToString(signature.getBytes(StandardCharsets.UTF_8));
 
-        logger.info("Токен, сгенерированный для пользователя: " + username);
+        logger.info("Токен, сгенерированный для пользователя: {}", username);
         return token;
     }
 
@@ -40,14 +42,14 @@ public class TokenUtil {
         try {
             String[] parts = token.split("\\.");
             if (parts.length != 2) {
-                logger.warning("Неверный формат токена");
+                logger.warn("Неверный формат токена");
                 return false;
             }
 
             String decodedContent = new String(Base64.getDecoder().decode(parts[0]), StandardCharsets.UTF_8);
             String[] contentParts = decodedContent.split(":");
             if (contentParts.length != 2) {
-                logger.warning("Недействительное содержимое токена");
+                logger.warn("Недействительное содержимое токена");
                 return false;
             }
 
@@ -55,7 +57,7 @@ public class TokenUtil {
             long expirationTime = Long.parseLong(contentParts[1]);
 
             if (Instant.now().getEpochSecond() > expirationTime) {
-                logger.warning("Срок действия токена для пользователя истек: " + user);
+                logger.warn("Срок действия токена для пользователя истек: {}", user);
                 return false;
             }
 
@@ -63,15 +65,15 @@ public class TokenUtil {
             String providedSignature = new String(Base64.getDecoder().decode(parts[1]), StandardCharsets.UTF_8);
 
             if (!expectedSignature.equals(providedSignature)) {
-                logger.warning("Несоответствие подписи токена для пользователя: " + user);
+                logger.warn("Несоответствие подписи токена для пользователя: {}", user);
                 return false;
             }
 
             username.append(user);
-            logger.info("Токен успешно проверен для пользователя: " + user);
+            logger.info("Токен успешно проверен для пользователя: {}", user);
             return true;
         } catch (Exception e) {
-            logger.severe("Проверка токена не удалась: " + e.getMessage());
+            logger.error("Проверка токена не удалась: {}", e.getMessage());
             return false;
         }
     }

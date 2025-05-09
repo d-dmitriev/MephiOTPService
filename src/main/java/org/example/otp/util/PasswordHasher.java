@@ -1,15 +1,17 @@
 package org.example.otp.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.util.logging.Logger;
 
 public class PasswordHasher {
-    private static final Logger logger = Logger.getLogger(PasswordHasher.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(PasswordHasher.class);
 
     // Настройки PBKDF2
     private static final int ITERATIONS = 600000;       // Кол-во итераций
@@ -33,7 +35,7 @@ public class PasswordHasher {
     public boolean check(String password, String storedHash) {
         String[] parts = storedHash.split(":");
         if (parts.length != 2) {
-            logger.warning("Сохраненный хэш недействителен (отсутствует соль или хэш)");
+            logger.warn("Сохраненный хэш недействителен (отсутствует соль или хэш)");
             return false;
         }
 

@@ -8,31 +8,21 @@ import org.example.otp.api.AuthHandler;
 import org.example.otp.api.UserApi;
 
 import com.sun.net.httpserver.HttpServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
+
 
 public class Main {
-    private static final Logger logger = Logger.getLogger(Main.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private static final int PORT = 8080;
 
     public static void main(String[] args) {
         try {
-            // Загрузить конфигурацию логгирования из logging.properties
-            String configPath = "src/main/resources/logging.properties";
-            if (Files.exists(Paths.get(configPath))) {
-                LogManager.getLogManager().readConfiguration(
-                        Files.newInputStream(Paths.get(configPath))
-                );
-                logger.info("Логгирование инициализировано");
-            } else {
-                System.err.println("Файл logging.properties не найден. Используется стандартное логгирование.");
-            }
-
             // Создаем директорию для логов, если её нет
             Files.createDirectories(Paths.get("logs"));
 
@@ -66,7 +56,7 @@ public class Main {
             }));
 
         } catch (IOException e) {
-            logger.severe("Не удалось запустить HTTP-сервер: " + e.getMessage());
+            logger.error("Не удалось запустить HTTP-сервер: {}", e.getMessage());
             System.exit(1);
         }
     }

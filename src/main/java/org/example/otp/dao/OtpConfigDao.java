@@ -2,12 +2,13 @@ package org.example.otp.dao;
 
 import org.example.otp.model.OtpConfig;
 import org.example.otp.util.DbConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.logging.Logger;
 
 public class OtpConfigDao {
-    private static final Logger logger = Logger.getLogger(OtpConfigDao.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(OtpConfigDao.class);
 
     public OtpConfig getConfig() {
         String sql = "SELECT * FROM otp_config LIMIT 1";
@@ -22,7 +23,7 @@ public class OtpConfigDao {
                 return config;
             }
         } catch (SQLException e) {
-            logger.severe("Ошибка получения конфигурации OTP: " + e.getMessage());
+            logger.error("Ошибка получения конфигурации OTP: {}", e.getMessage());
         }
         // Default values
         return new OtpConfig();
@@ -38,7 +39,7 @@ public class OtpConfigDao {
             pstmt.executeUpdate();
             logger.info("Конфигурация OTP обновлена");
         } catch (SQLException e) {
-            logger.severe("Ошибка обновления конфигурации OTP: " + e.getMessage());
+            logger.error("Ошибка обновления конфигурации OTP: {}", e.getMessage());
         }
     }
 }

@@ -2,14 +2,15 @@ package org.example.otp.dao;
 
 import org.example.otp.model.OtpCode;
 import org.example.otp.util.DbConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 public class OtpCodeDao {
-    private static final Logger logger = Logger.getLogger(OtpCodeDao.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(OtpCodeDao.class);
 
     public void save(OtpCode code) {
         String sql = "INSERT INTO otp_codes(user_id, operation_id, code, status, expires_at) VALUES (?, ?, ?, ?, ?)";
@@ -22,9 +23,9 @@ public class OtpCodeDao {
             pstmt.setString(4, code.getStatus());
             pstmt.setTimestamp(5, Timestamp.valueOf(code.getExpiresAt()));
             pstmt.executeUpdate();
-            logger.info("Код OTP сохранен для идентификатора пользователя: " + code.getUserId());
+            logger.info("Код OTP сохранен для идентификатора пользователя: {}", code.getUserId());
         } catch (SQLException e) {
-            logger.severe("Ошибка сохранения OTP-кода: " + e.getMessage());
+            logger.error("Ошибка сохранения OTP-кода: {}", e.getMessage());
         }
     }
 
@@ -49,7 +50,7 @@ public class OtpCodeDao {
                 return Optional.of(otpCode);
             }
         } catch (SQLException e) {
-            logger.severe("Ошибка при поиске OTP-кода: " + e.getMessage());
+            logger.error("Ошибка при поиске OTP-кода: {}", e.getMessage());
         }
         return Optional.empty();
     }
@@ -64,7 +65,7 @@ public class OtpCodeDao {
             pstmt.executeUpdate();
             logger.info("Код OTP отмечен как использованный");
         } catch (SQLException e) {
-            logger.severe("Ошибка маркировки кода OTP как использованного: " + e.getMessage());
+            logger.error("Ошибка маркировки кода OTP как использованного: {}", e.getMessage());
         }
     }
 
@@ -74,9 +75,9 @@ public class OtpCodeDao {
              Statement stmt = conn.createStatement()) {
 
             int count = stmt.executeUpdate(sql);
-            logger.info(count + " OTP-кода истекли.");
+            logger.info("{} OTP-кода истекли.", count);
         } catch (SQLException e) {
-            logger.severe("Ошибка истечения срока действия одноразовых паролей: " + e.getMessage());
+            logger.error("Ошибка истечения срока действия одноразовых паролей: {}", e.getMessage());
         }
     }
 
@@ -87,9 +88,9 @@ public class OtpCodeDao {
 
             pstmt.setInt(1, userId);
             pstmt.executeUpdate();
-            logger.info("Удалены одноразовые пароли для идентификатора пользователя: " + userId);
+            logger.info("Удалены одноразовые пароли для идентификатора пользователя: {}", userId);
         } catch (SQLException e) {
-            logger.severe("Ошибка удаления OTP-кодов по идентификатору пользователя: " + e.getMessage());
+            logger.error("Ошибка удаления OTP-кодов по идентификатору пользователя: {}", e.getMessage());
         }
     }
 }

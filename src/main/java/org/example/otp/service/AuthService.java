@@ -4,12 +4,13 @@ import org.example.otp.dao.UserDao;
 import org.example.otp.model.User;
 import org.example.otp.util.PasswordHasher;
 import org.example.otp.util.TokenUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 public class AuthService {
-    private static final Logger logger = Logger.getLogger(AuthService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
     public static final String ADMIN_EXISTS = "ADMIN_EXISTS";
     public static final String USER_EXISTS = "USER_EXISTS";
 
@@ -23,12 +24,12 @@ public class AuthService {
      */
     public String registerUser(String login, String password, String role) {
         if ("ADMIN".equals(role) && userDao.existsAdmin()) {
-            logger.warning("Регистрация отклонена: Администратор уже существует");
+            logger.warn("Регистрация отклонена: Администратор уже существует");
             return ADMIN_EXISTS;
         }
 
         if (userDao.findByLogin(login).isPresent()) {
-            logger.warning("Пользователь с таким логином уже существует: " + login);
+            logger.warn("Пользователь с таким логином уже существует: {}", login);
             return USER_EXISTS;
         }
 
@@ -50,13 +51,13 @@ public class AuthService {
     public String authenticateUser(String login, String password) {
         var optionalUser = userDao.findByLogin(login);
         if (optionalUser.isEmpty()) {
-            logger.warning("Пользователь не найден: " + login);
+            logger.warn("Пользователь не найден: {}", login);
             return null;
         }
 
         User user = optionalUser.get();
         if (!passwordHasher.check(password, user.getPasswordHash())) {
-            logger.warning("Неверный пароль для пользователя: " + login);
+            logger.warn("Неверный пароль для пользователя: {}", login);
             return null;
         }
 

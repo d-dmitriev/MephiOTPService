@@ -2,14 +2,15 @@ package org.example.otp.handler;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.logging.Logger;
 
 public class LoggingHandler implements HttpHandler {
-    private static final Logger logger = Logger.getLogger(LoggingHandler.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(LoggingHandler.class);
     private final HttpHandler next;
 
     public LoggingHandler(HttpHandler next) {
@@ -25,13 +26,13 @@ public class LoggingHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         String uri = exchange.getRequestURI().toString();
 
-        logger.info(String.format("Входящий запрос: %s %s | IP: %s", method, uri, clientIp));
+        logger.info("Входящий запрос: {} {} | IP: {}", method, uri, clientIp);
 
         // Выполняем реальный обработчик
         try {
             next.handle(exchange);
         } catch (Exception e) {
-            logger.severe("Ошибка обработки запроса " + method + " " + uri + ": " + e.getMessage());
+            logger.error("Ошибка обработки запроса {} {}: {}", method, uri, e.getMessage());
             exchange.sendResponseHeaders(500, -1); // Internal Server Error
             exchange.getResponseBody().write("Внутренняя ошибка сервера".getBytes(StandardCharsets.UTF_8));
             exchange.getResponseBody().close();
@@ -40,8 +41,7 @@ public class LoggingHandler implements HttpHandler {
         // Логируем ответ
         long duration = System.currentTimeMillis() - start.toEpochMilli();
         int responseCode = getResponseCode(exchange);
-        logger.info(String.format("Запрос выполнен: %s %s | Код ответа: %d | Время: %d мс",
-                method, uri, responseCode, duration));
+        logger.info("Запрос выполнен: {} {} | Код ответа: {} | Время: {} мс", method, uri, responseCode, duration);
     }
 
     private int getResponseCode(HttpExchange exchange) {

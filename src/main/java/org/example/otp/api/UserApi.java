@@ -3,16 +3,17 @@ package org.example.otp.api;
 import org.example.otp.service.*;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.logging.Logger;
 
 import static org.example.otp.util.HttpUtils.*;
 
 public class UserApi implements HttpHandler {
-    private static final Logger logger = Logger.getLogger(UserApi.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(UserApi.class);
     private static final String INVALID_OR_EXPIRED_CODE = "Недействительный или просроченный код";
     private static final String AUTHENTICATION_REQUIRED = "Требуется аутентификация";
     public static final String INVALID_CHANNEL = "Неверный канал";
@@ -30,7 +31,7 @@ public class UserApi implements HttpHandler {
         Object userAttr = exchange.getHttpContext().getAttributes().get("username");
         if (userAttr == null) {
             sendError(exchange, AUTHENTICATION_REQUIRED, 401);
-            logger.severe("Атрибут username не существует в http-контексте");
+            logger.error("Атрибут username не существует в http-контексте");
             return;
         }
         String username = userAttr.toString();
@@ -72,7 +73,7 @@ public class UserApi implements HttpHandler {
                     break;
                 default:
                     sendError(exchange, INVALID_CHANNEL, 400);
-                    logger.severe(INVALID_CHANNEL);
+                    logger.error(INVALID_CHANNEL);
                     return;
             }
 
@@ -96,12 +97,12 @@ public class UserApi implements HttpHandler {
                 sendResponse(exchange, "{\"valid\": true}", 200);
             } else {
                 sendError(exchange, INVALID_OR_EXPIRED_CODE, 400);
-                logger.severe(INVALID_OR_EXPIRED_CODE);
+                logger.error(INVALID_OR_EXPIRED_CODE);
             }
 
         } else {
             sendError(exchange, NOT_FOUND, 404);
-            logger.severe(NOT_FOUND);
+            logger.error(NOT_FOUND);
         }
     }
 }

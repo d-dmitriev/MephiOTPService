@@ -1,12 +1,14 @@
 package org.example.otp.scheduler;
 
 import org.example.otp.dao.OtpCodeDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
 public class OtpExpiryScheduler {
-    private static final Logger logger = Logger.getLogger(OtpExpiryScheduler.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(OtpExpiryScheduler.class);
     private final Timer timer = new Timer();
     private static final long INITIAL_DELAY = 0;        // Начать сразу
     private static final long PERIOD = 60_000;         // Каждую минуту
@@ -21,11 +23,11 @@ public class OtpExpiryScheduler {
                     logger.info("Запуск запланированной задачи по удалению старых одноразовых кодов...");
                     otpCodeDao.markAllExpired();
                 } catch (Exception e) {
-                    logger.severe("Ошибка при проверке срока действия одноразового пароля: " + e.getMessage());
+                    logger.error("Ошибка при проверке срока действия одноразового пароля: {}", e.getMessage());
                 }
             }
         }, INITIAL_DELAY, PERIOD);
-        logger.info("Планировщик срока действия OTP запущен. Проверка каждые " + (PERIOD / 1000) + " секунд.");
+        logger.info("Планировщик срока действия OTP запущен. Проверка каждые {} секунд.", (PERIOD / 1000));
     }
 
     public void stop() {

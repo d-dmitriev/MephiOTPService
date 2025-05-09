@@ -1,13 +1,15 @@
 package org.example.otp.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 public class EmailNotificationService {
-    private static final Logger logger = Logger.getLogger(EmailNotificationService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(EmailNotificationService.class);
 
     private final Properties emailProps = new Properties();
     private Session session;
@@ -27,7 +29,7 @@ public class EmailNotificationService {
                 }
             });
         } catch (Exception e) {
-            logger.severe("Не удалось загрузить конфигурацию электронной почты: " + e.getMessage());
+            logger.error("Не удалось загрузить конфигурацию электронной почты: {}", e.getMessage());
         }
     }
 
@@ -40,9 +42,9 @@ public class EmailNotificationService {
             message.setText("Ваш код подтверждения: " + code);
 
             Transport.send(message);
-            logger.info("Код OTP отправлен по электронной почте: " + toEmail);
+            logger.info("Код OTP отправлен по электронной почте: {}", toEmail);
         } catch (MessagingException | RuntimeException e) {
-            logger.severe("Не удалось отправить email: " + e.getMessage());
+            logger.error("Не удалось отправить email: {}", e.getMessage());
         }
     }
 }
