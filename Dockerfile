@@ -16,7 +16,7 @@ COPY src/main/resources/application.properties application.properties
 COPY src/main/resources/email.properties email.properties
 COPY src/main/resources/sms.properties sms.properties
 COPY src/main/resources/telegram.properties telegram.properties
-COPY src/main/resources/logging.properties logging.properties
+COPY src/main/resources/logback.xml logback.xml
 
 # Открываем порт API
 EXPOSE 8080
